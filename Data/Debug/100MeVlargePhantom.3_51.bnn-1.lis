@@ -1,0 +1,13 @@
+1
+   Cartesian binning n.   1  "Energy    " , generalized particle n.  208
+      X coordinate: from -1.8500E+02 to  1.8500E+02 cm,     1 bins ( 3.7000E+02 cm wide)
+      Y coordinate: from -1.2500E+02 to  1.2500E+02 cm,     1 bins ( 2.5000E+02 cm wide)
+      Z coordinate: from  1.2500E+02 to  3.7500E+02 cm,     1 bins ( 2.5000E+02 cm wide)
+      Data follow in a matrix A(ix,iy,iz), format (1(5x,1p,10(1x,e11.4)))
+
+      accurate deposition along the tracks requested
+       4.1836E-09
+
+      Percentage errors follow in a matrix A(ix,iy,iz), format (1(5x,1p,10(1x,e11.4)))
+
+       9.9000E+01
