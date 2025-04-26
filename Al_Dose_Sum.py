@@ -20,6 +20,7 @@ os.makedirs(results_dir, exist_ok=True)
 
 # Define the list of data file paths and corresponding thickness values in cm
 file_paths = [
+    "./Data/Aluminium/100MeVnoShield_51.txt",
     "./Data/Aluminium/100MeV1cm_51.txt",
     "./Data/Aluminium/100MeV2cm_51.txt",
     "./Data/Aluminium/100MeV2.25cm_51.txt",
@@ -37,7 +38,7 @@ file_paths = [
     "./Data/Aluminium/100MeV20cm_51.txt",
 ]
 
-thicknesses = [1, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4, 4.5, 6, 8, 10, 20]  # Corresponding thickness in cm
+thicknesses = [0, 1, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4, 4.5, 6, 8, 10, 20]  # Corresponding thickness in cm
 
 def extract_dose_and_errors(file_path):
     """
@@ -84,20 +85,29 @@ if __name__ == "__main__":
 
     for file_path, thickness in zip(file_paths, thicknesses):
         dose_values, error_values = extract_dose_and_errors(file_path)
-        
-        mean_dose = np.mean(dose_values)
-        normalised_dose = mean_dose * 1e6
+
+        # Step 1: Sum the GeV/g/proton values
+        total_dose_gev_per_g = np.sum(dose_values)
+
+        # Step 2: Convert GeV/g -> Sv
+        total_dose_Sv = total_dose_gev_per_g * 1.602e-10
+
+        # Step 3: Convert Sv -> pSv
+        dose_per_proton_pSv = total_dose_Sv * 1e12
+
+        # Step 4: Error calculation
         total_error = np.sum(error_values)
-        normalised_error = total_error / 1000  # Normalize since there are 1000 bins
-        error_in_dose = normalised_dose * (normalised_error / 100.0)
+        normalised_error = total_error / 1000  # assuming 1000 bins
+        error_in_dose = dose_per_proton_pSv * (normalised_error / 100.0)
 
-        results.append([thickness, normalised_dose, normalised_error, error_in_dose])
+        results.append([thickness, dose_per_proton_pSv, normalised_error, error_in_dose])
 
-    # Convert results into a Pandas DataFrame
+    # Convert results into a DataFrame
     df = pd.DataFrame(results, columns=["Thickness (cm)", "Dose per Proton (pSv)", "Normalised Error (%)", "Absolute Error (pSv)"])
     
     # Print table in terminal
     print(df.to_string(index=False))
+
 
     ################################################################################
     # Convert Table to a PDF Using ReportLab
@@ -164,26 +174,27 @@ fig.add_trace(go.Scatter(
     ))
 
 fig.update_layout(
-        title="Dose per Proton vs. Material Thickness (Aluminium)",
-        title_font=dict(size=20, family="Arial"),
-        xaxis=dict(
-            title="Material Thickness (cm)",
-            title_font=dict(size=18),
-            tickfont=dict(size=14),
-            showgrid=True
-        ),
-        yaxis=dict(
-            title="Dose per Proton (pSv)",
-            title_font=dict(size=18),
-            tickfont=dict(size=14),
-            type="log",
-            showgrid=True
-        ),
-        template="simple_white",
-        hovermode="x",
-        font=dict(family="Arial", size=14),
-        margin=dict(l=80, r=80, t=50, b=50)
-    )
+    title="Dose per Proton vs. Material Thickness (Aluminium)",
+    title_font=dict(size=30, family="Arial"), 
+    xaxis=dict(
+        title="Material Thickness (cm)",
+        title_font=dict(size=26),              
+        tickfont=dict(size=22),                
+        showgrid=True
+    ),
+    yaxis=dict(
+        title="Dose per Proton (pSv)",
+        title_font=dict(size=26),
+        tickfont=dict(size=22),
+        type="log",
+        showgrid=True
+    ),
+    template="simple_white",
+    hovermode="x",
+    font=dict(family="Arial", size=22),        # general text font size
+    margin=dict(l=100, r=100, t=80, b=80)
+)
+
 
 fig.show()
 
@@ -192,5 +203,5 @@ fig.show()
     ################################################################################
 
 plot_pdf_path = os.path.join(results_dir, "dose_plot.pdf")
-fig.write_image(plot_pdf_path, format="pdf")
+fig.write_image(plot_pdf_path, format="pdf", width=1200, height=900)
 print(f"Plot saved as PDF: {os.path.abspath(plot_pdf_path)}")

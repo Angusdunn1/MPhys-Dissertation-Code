@@ -29,12 +29,15 @@ file_paths = [
     "./Data/Polyethylene/100MeV10cmPlastic_51.txt",
     "./Data/Polyethylene/100MeV12cmPlastic_51.txt",
     "./Data/Polyethylene/100MeV15cmPlastic_51.txt",
+    "./Data/Polyethylene/100MeV18cmPlastic_51.txt",
     "./Data/Polyethylene/100MeV20cmPlastic_51.txt",
+    "./Data/Polyethylene/100MeV22cmPlastic_51.txt",
+    "./Data/Polyethylene/100MeV25cmPlastic_51.txt",
     "./Data/Polyethylene/100MeV30cmPlastic_51.txt",
     "./Data/Polyethylene/100MeV50cmPlastic_51.txt"
 ]
 
-thicknesses = [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 30, 50]  # Corresponding thickness in cm
+thicknesses = [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 18, 20, 22, 25, 30, 50]  # Corresponding thickness in cm
 
 def extract_dose_and_errors(file_path):
     """
@@ -81,20 +84,29 @@ if __name__ == "__main__":
 
     for file_path, thickness in zip(file_paths, thicknesses):
         dose_values, error_values = extract_dose_and_errors(file_path)
-        
-        mean_dose = np.mean(dose_values)
-        normalised_dose = mean_dose * 1e6
+
+        # Step 1: Sum the GeV/g/proton values
+        total_dose_gev_per_g = np.sum(dose_values)
+
+        # Step 2: Convert GeV/g -> Sv
+        total_dose_Sv = total_dose_gev_per_g * 1.602e-10
+
+        # Step 3: Convert Sv -> pSv
+        dose_per_proton_pSv = total_dose_Sv * 1e12
+
+        # Step 4: Error calculation
         total_error = np.sum(error_values)
-        normalised_error = total_error / 1000  # Normalize since there are 1000 bins
-        error_in_dose = normalised_dose * (normalised_error / 100.0)
+        normalised_error = total_error / 1000  # assuming 1000 bins
+        error_in_dose = dose_per_proton_pSv * (normalised_error / 100.0)
 
-        results.append([thickness, normalised_dose, normalised_error, error_in_dose])
+        results.append([thickness, dose_per_proton_pSv, normalised_error, error_in_dose])
 
-    # Convert results into a Pandas DataFrame
+    # Convert results into a DataFrame
     df = pd.DataFrame(results, columns=["Thickness (cm)", "Dose per Proton (pSv)", "Normalised Error (%)", "Absolute Error (pSv)"])
     
     # Print table in terminal
     print(df.to_string(index=False))
+
 
     ################################################################################
     # Convert Table to a PDF Using ReportLab
@@ -162,23 +174,23 @@ fig.add_trace(go.Scatter(
 
 fig.update_layout(
         title="Dose per Proton vs. Material Thickness (Polyethylene)",
-        title_font=dict(size=20, family="Arial"),
+        title_font=dict(size=30, family="Arial"),
         xaxis=dict(
             title="Material Thickness (cm)",
-            title_font=dict(size=18),
-            tickfont=dict(size=14),
+            title_font=dict(size=26),
+            tickfont=dict(size=22),
             showgrid=True
         ),
         yaxis=dict(
             title="Dose per Proton (pSv)",
-            title_font=dict(size=18),
-            tickfont=dict(size=14),
+            title_font=dict(size=26),
+            tickfont=dict(size=22),
             #type="log",
             showgrid=True
         ),
         template="simple_white",
         hovermode="x",
-        font=dict(family="Arial", size=14),
+        font=dict(family="Arial", size=22),
         margin=dict(l=80, r=80, t=50, b=50)
     )
 

@@ -1,0 +1,83 @@
+Example FLUKA Input File
+
+The following FLUKA input file defines a simplified simulation used in this study to model a 100MeV 
+proton beam interacting with a spacecraft shielding configuration. It was generated and managed using 
+the FLAIR interface.
+
+The geometry includes multiple nested regions: 
+- An external vacuum, an aluminium shield of 3.5 cm thickness
+- An internal plastic shield, an air-filled crew habitat
+- A simplified carbon-based phantom representing an astronaut
+
+The simulation uses Monte Carlo sampling of 10^6 primary protons, with scoring implemented via USRBIN 
+to record dose equivalent in both the phantom and spacecraft interior.
+
+This input serves as a representative example of the configurations used throughout the project, 
+particularly for the dual-layer shielding simulations.
+
+
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+TITLE
+Trial Input 100MeV Proton Beam on Aluminium Target
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+BEAM            -0.1                                                  PROTON
+BEAMPOS          0.0       0.0     -50.0
+*
+GEOBEGIN                                                              COMBNAME
+    0    0          A simple Al target inside vacuum
+RPP body1      -5000000.0 +5000000.0 -5000000.0 +5000000.0 -5000000.0 +5000000.0
+RPP body2      -1000000.0 +1000000.0 -1000000.0 +1000000.0 -100.0 +1000000.0
+*Aluminium shield (3.5cm)
+RPP body3      -254.5 +254.5 -254.5 +254.5 +45.5 +454.5
+*Inside Shield (Plastic)
+RPP body4      -251.0 +251.0 -251.0 +251.0 +49.0 +451.0
+*The Habitatble Area
+RPP body5      -250.0 +250.0 -250.0 +250.0 +50.0 +450.0
+*Phantom
+RCC body5      -85.0 0.0 250.0 +170.0 0 0 +25.0
+RPP body6      -85.0 +85.0 -25.0 +25.0 +225.0 +275.0
+END
+* black hole
+regBH1       5 +body1 -body2
+* vacuum around
+regVA2       5 +body2 -body3
+* Al target 1st half
+regAL3       5 +body3 -body4 -body5 -body6
+* Al target 1st half
+regPlastic   5 +body4 -body5 -body6
+regAIR       5 +body5 -body6
+regPHA       5 +body4
+END
+GEOEND
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+MATERIAL        13.0               2.699      10.0                    ALUMINUM
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+*  Al shield (3.5cm)
+ASSIGNMA    ALUMINUM    regAL3
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+*  Plastic shield
+ASSIGNMA    PLASCINTregPlastic
+*  External Black Hole
+ASSIGNMA    BLCKHOLE    regBH1
+*  Vacuum
+ASSIGNMA      VACUUM    regVA2
+ASSIGNMA         AIR    regAIR
+ASSIGNMA      CARBON    regPHA
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+* e+e- and gamma production threshold set at 10 MeV
+EMFCUT        -0.010     0.010       1.0  ALUMINUM                    PROD-CUT
+* score in each region energy deposition and stars produced by primaries
+*SCORE         ENERGY
+* Cartesian binning of the deposited energy inside the target
+USRBIN            10   DOSE-EQ     -51.0     +85.0     +25.0    +275.0DoseEq
+USRBIN         -85.0     -25.0    +225.0      10.0      10.0      10.0 &
+* Cartesian binning of the deposited energy inside the target
+USRBIN            10   DOSE-EQ       -50    +300.0    +300.0    +500.0DoseEq1
+USRBIN        -300.0    -300.0       0.0     200.0     200.0     200.0 &
+AUXSCORE      USRBIN                        DoseEq                    AMB74
+AUXSCORE      USRBIN                       DoseEq1                    AMB74
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+RANDOMIZ         1.0
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8
+START      1000000.0
+STOP
