@@ -163,23 +163,57 @@ df["Dose per Proton (pSv)"] = df["Dose per Proton (pSv)"].replace(0, np.nan)
 
 fig = go.Figure()
 
+# First trace: all points except 3.5 cm (red points, red error bars)
+mask_red = df["Thickness (cm)"] != 3.5
 fig.add_trace(go.Scatter(
-        x=df["Thickness (cm)"],
-        y=df["Dose per Proton (pSv)"],
-        error_y=dict(type='data', array=df["Absolute Error (pSv)"], visible=True),
-        mode='lines+markers',
-        marker=dict(size=10, color='red', symbol='circle'),
-        line=dict(width=3),
-        name="Dose per Proton"
-    ))
+    x=df["Thickness (cm)"][mask_red],
+    y=df["Dose per Proton (pSv)"][mask_red],
+    error_y=dict(
+        type='data',
+        array=df["Absolute Error (pSv)"][mask_red],
+        visible=True,
+        color='red'  # Red error bars
+    ),
+    mode='lines+markers',
+    marker=dict(
+        size=10,
+        color='red',
+        symbol='circle'
+    ),
+    line=dict(
+        width=3,
+        color='red'
+    ),
+    name="Dose per Proton (other points)"
+))
+
+# Second trace: only 3.5 cm point (blue point, blue error bar)
+mask_blue = df["Thickness (cm)"] == 3.5
+fig.add_trace(go.Scatter(
+    x=df["Thickness (cm)"][mask_blue],
+    y=df["Dose per Proton (pSv)"][mask_blue],
+    error_y=dict(
+        type='data',
+        array=df["Absolute Error (pSv)"][mask_blue],
+        visible=True,
+        color='blue'  # Blue error bar
+    ),
+    mode='markers',  # No line, just marker
+    marker=dict(
+        size=12,  # (Optional) slightly bigger blue point
+        color='blue',
+        symbol='circle'
+    ),
+    name="Dose per Proton (3.5 cm)"
+))
 
 fig.update_layout(
     title="Dose per Proton vs. Material Thickness (Aluminium)",
-    title_font=dict(size=30, family="Arial"), 
+    title_font=dict(size=30, family="Arial"),
     xaxis=dict(
         title="Material Thickness (cm)",
-        title_font=dict(size=26),              
-        tickfont=dict(size=22),                
+        title_font=dict(size=26),
+        tickfont=dict(size=22),
         showgrid=True
     ),
     yaxis=dict(
@@ -191,10 +225,10 @@ fig.update_layout(
     ),
     template="simple_white",
     hovermode="x",
-    font=dict(family="Arial", size=22),        # general text font size
-    margin=dict(l=100, r=100, t=80, b=80)
+    font=dict(family="Arial", size=22),
+    margin=dict(l=100, r=100, t=80, b=80),
+    showlegend=False  # <<-- This hides the key
 )
-
 
 fig.show()
 

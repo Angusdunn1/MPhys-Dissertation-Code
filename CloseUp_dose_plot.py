@@ -3,11 +3,11 @@ import pandas as pd
 import plotly.graph_objects as go
 import os
 
-# ✅ Define the results directory and ensure it exists
+# Define the results directory and ensure it exists
 results_dir = "./Results/Aluminium/"
 os.makedirs(results_dir, exist_ok=True)
 
-# ✅ Manually specify the data file paths and corresponding thickness values
+# Manually specify the data file paths and corresponding thickness values
 file_paths = [
     "./Data/Aluminium/100MeV3.5cm_51.txt",
     "./Data/Aluminium/100MeV4cm_51.txt",
@@ -17,7 +17,7 @@ file_paths = [
     "./Data/Aluminium/100MeV10cm_51.txt"
 ]
 
-thicknesses = [3.5, 4, 4.5, 6, 8, 10]  # ✅ Corresponding thickness values in cm
+thicknesses = [3.5, 4, 4.5, 6, 8, 10]  # Corresponding thickness values in cm
 
 def extract_dose_and_errors(file_path):
     """
@@ -57,7 +57,7 @@ def extract_dose_and_errors(file_path):
                 
     return np.array(dose_values), np.array(error_values)
 
-# ✅ Process only the selected files
+# Process only the selected files
 results = []
 
 for file_path, thickness in zip(file_paths, thicknesses):
@@ -67,15 +67,15 @@ for file_path, thickness in zip(file_paths, thicknesses):
     normalised_dose = mean_dose * 1e6  # Convert to pSv
 
     total_error = np.sum(error_values)
-    normalised_error = total_error / 1000  # Normalize percentage error per bin
+    normalised_error = total_error / 1000  # Normalise percentage error per bin
     error_in_dose = normalised_dose * (normalised_error / 100.0)  # Absolute error in pSv
 
     results.append([thickness, normalised_dose, normalised_error, error_in_dose])
 
-# ✅ Convert results into a Pandas DataFrame
+# Convert results into a Pandas DataFrame
 df_zoomed = pd.DataFrame(results, columns=["Thickness (cm)", "Dose per Proton (pSv)", "Normalised Error (%)", "Absolute Error (pSv)"])
 
-# ✅ Round for scientific readability
+# Round for scientific readability
 df_zoomed = df_zoomed.round({
     "Thickness (cm)": 2,
     "Dose per Proton (pSv)": 3,
@@ -83,7 +83,7 @@ df_zoomed = df_zoomed.round({
     "Absolute Error (pSv)": 3
 })
 
-# ✅ Ensure no zero values for plotting
+# Ensure no zero values for plotting
 df_zoomed["Dose per Proton (pSv)"] = df_zoomed["Dose per Proton (pSv)"].replace(0, pd.NA)
 
 ################################################################################
@@ -102,7 +102,7 @@ fig.add_trace(go.Scatter(
     name="Dose per Proton (Zoomed)"
 ))
 
-# ✅ Improve layout for the zoomed-in scientific plot
+# Improve layout for the zoomed-in scientific plot
 fig.update_layout(
     title="Dose per Proton vs. Thickness (Zoomed In: Thickness > 3.5 cm)",
     title_font=dict(size=20, family="Arial"),

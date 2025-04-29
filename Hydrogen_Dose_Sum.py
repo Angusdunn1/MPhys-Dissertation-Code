@@ -106,7 +106,7 @@ if __name__ == "__main__":
 # Define PDF table path
 pdf_table_path = os.path.join(results_dir, "dose_summary_table.pdf")
 
-# **Round results for a scientific report** (2-3 decimal places where appropriate)
+# Round results for a scientific report (2-3 decimal places)
 df = df.round({
     "Thickness (cm)": 2, 
     "Dose per Proton (pSv)": 3, 

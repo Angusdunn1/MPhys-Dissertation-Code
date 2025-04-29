@@ -103,7 +103,7 @@ if __name__ == "__main__":
 # Define PDF table path
 pdf_table_path = os.path.join(results_dir, "dose_summary_table.pdf")
 
-# **Round results for a scientific report** (2-3 decimal places where appropriate)
+# Round results for a scientific report (2-3 decimal places)
 df = df.round({
     "Thickness (cm)": 2, 
     "Dose per Proton (pSv)": 3, 
@@ -117,7 +117,6 @@ table_data = [df.columns.tolist()] + df.values.tolist()
 # Create a **landscape PDF document** for readability
 pdf = SimpleDocTemplate(pdf_table_path, pagesize=landscape(letter))
 
-# Define a **lighter grey header** for a clean, professional look
 table_style = TableStyle([
     ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#BBBBBB")),  # **Lighter grey header**
     ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),  # Black text in header
@@ -130,7 +129,7 @@ table_style = TableStyle([
     ('GRID', (0, 0), (-1, -1), 0.5, colors.black),  # Fine black grid lines
 ])
 
-# Set **column widths** to improve spacing
+# Set column widths to improve spacing
 col_widths = [1.5 * inch] * len(df.columns)  
 
 # Create the table

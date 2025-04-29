@@ -10,7 +10,7 @@ def exp_decay(x, D0, mu):
     return D0 * np.exp(-mu * x)
 
 def fixed_decay(x, mu):
-    """For non-Al materials we anchor D0 at 36.731841 pSv and fit only μ."""
+    """For non-Al materials we anchor D0 at 36.731841 pSv and fit only mu."""
     D0 = 36.731841
     return D0 * np.exp(-mu * x)
 
@@ -115,7 +115,7 @@ def process_material(material_name, file_paths, thicknesses, plot_dir="./Plots")
         results.append([thick, dose_pSv, abs_err])
 
     if len(results) < 3:
-        print(f"⚠️  Not enough data for {material_name}, skipping.")
+        print(f"Not enough data for {material_name}, skipping.")
         failed_materials.append(material_name)
         return
 
@@ -233,7 +233,7 @@ def process_material(material_name, file_paths, thicknesses, plot_dir="./Plots")
             plt.close()
 
     except Exception as e:
-        print(f"❌  Fit failed for {material_name}: {e}")
+        print(f"Fit failed for {material_name}: {e}")
         failed_materials.append(material_name)
 
 
@@ -246,8 +246,8 @@ if __name__ == "__main__":
     df_out = pd.DataFrame(absorption_data).round(5)
     df_out.to_csv("absorption_coefficients_summary.csv", index=False)
 
-    print("\n✅ Processing complete.")
+    print("\nProcessing complete.")
     if failed_materials:
-        print("⚠️ Fit failed for:")
+        print("Fit failed for:")
         for m in failed_materials:
             print(" -", m)
